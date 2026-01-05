@@ -63,8 +63,10 @@ function buildPolylineStrings(smoothX, smoothY, cols, rows, horizontal, vertical
 
 export default function Home() {
   const svgRef = useRef(null);
+  // respect reduced-motion preference
+  const prefersReduced = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // smoothing factor for the animation (higher => faster, stronger pull)
-  const alpha = 0.12;
+  const alpha = prefersReduced ? 0.03 : 0.12;
 
   const rows = 9;
   const cols = 9;
@@ -92,6 +94,8 @@ export default function Home() {
   const overlayVerticalRefs = useRef(Array(cols).fill(null));
 
   const gradientRef = useRef(null);
+  const lastMouseRef = useRef({ x: width / 2, y: height / 2 });
+  const ripplesRef = useRef([]);
 
   // initialize to base grid
   useEffect(() => {
@@ -112,12 +116,16 @@ export default function Home() {
     // convert mouse to SVG coords
     const { x: mouseX, y: mouseY } = convertClientToSvgCoords(evt.clientX, evt.clientY);
 
+    // remember last mouse for distance-based styling and ripple center
+    lastMouseRef.current.x = mouseX;
+    lastMouseRef.current.y = mouseY;
+
     // move the radial gradient used by the mask so overlay brightens near mouse
     if (gradientRef.current) {
       gradientRef.current.setAttribute('cx', mouseX);
       gradientRef.current.setAttribute('cy', mouseY);
       // radius roughly a third of the diagonal
-      const r = Math.max(width, height) * 0.5;
+      const r = Math.max(width, height) * 0.3;
       gradientRef.current.setAttribute('r', r);
     }
 
@@ -158,6 +166,14 @@ export default function Home() {
     }
   };
 
+  const onMouseDown = (evt) => {
+    if (prefersReduced) return;
+    const { x: mx, y: my } = convertClientToSvgCoords(evt.clientX, evt.clientY);
+    // small impulse ripple
+    ripplesRef.current.push({ x: mx, y: my, start: performance.now(), duration: 600, maxRadius: Math.max(width, height) * 0.9, strength: 140 });
+    if (!runningRef.current) startAnimationLoop();
+  };
+
   function convertClientToSvgCoords(x,y) {
     const svg = svgRef.current;
     if (!svg) return { x: 0, y: 0 };
@@ -188,8 +204,41 @@ export default function Home() {
         const tx = targetX.current[i];
         const ty = targetY.current[i];
 
-        const nx = sx + (tx - sx) * alpha;
-        const ny = sy + (ty - sy) * alpha;
+        // apply active ripples to the current target before smoothing
+        let adjTx = tx;
+        let adjTy = ty;
+        const ripples = ripplesRef.current;
+        if (ripples && ripples.length) {
+          const baseIdx = i;
+          const col = baseIdx % cols;
+          const row = Math.floor(baseIdx / cols);
+          const bx = pointsX[col];
+          const by = pointsY[row];
+
+          for (let r = ripples.length - 1; r >= 0; r--) {
+            const p = ripples[r];
+            const elapsed = performance.now() - p.start;
+            const t = elapsed / p.duration;
+            if (t >= 1) {
+              ripples.splice(r, 1);
+              continue;
+            }
+            const radius = p.maxRadius * t;
+            const dx = bx - p.x;
+            const dy = by - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < radius && dist > 0.0001) {
+              const push = (1 - dist / radius) * p.strength * (1 - t);
+              const ux = dx / dist;
+              const uy = dy / dist;
+              adjTx += ux * push;
+              adjTy += uy * push;
+            }
+          }
+        }
+
+        const nx = sx + (adjTx - sx) * alpha;
+        const ny = sy + (adjTy - sy) * alpha;
 
         smoothX.current[i] = nx;
         smoothY.current[i] = ny;
@@ -214,16 +263,42 @@ export default function Home() {
       for (let j = 0; j < rows; j++) {
           // update base + overlay horizontal lines
           const baseEl = baseHorizontalRefs.current[j];
-          if (baseEl) baseEl.setAttribute('points', horizontal[j]);
           const overEl = overlayHorizontalRefs.current[j];
+          if (baseEl) baseEl.setAttribute('points', horizontal[j]);
           if (overEl) overEl.setAttribute('points', horizontal[j]);
+          // distance-based styling (per-line) based on last mouse Y
+          const my = lastMouseRef.current.y;
+          const distY = Math.abs(pointsY[j] - my);
+          const norm = Math.min(1, distY / (Math.max(width, height) * 0.5));
+          // overlay: brighter and slightly thicker when close
+          if (overEl) {
+            overEl.setAttribute('stroke-width', `${1.6 - norm * 0.9}`);
+            overEl.setAttribute('stroke-opacity', `${1 - norm * 0.7}`);
+          }
+          // base: darker, thinner further away
+          if (baseEl) {
+            baseEl.setAttribute('stroke-width', `${0.9 - norm * 0.4}`);
+            baseEl.setAttribute('stroke-opacity', `${0.6 - norm * 0.45}`);
+          }
       }
 
       for (let i = 0; i < cols; i++) {
         const baseEl = baseVerticalRefs.current[i];
-        if (baseEl) baseEl.setAttribute('points', vertical[i]);
         const overEl = overlayVerticalRefs.current[i];
+        if (baseEl) baseEl.setAttribute('points', vertical[i]);
         if (overEl) overEl.setAttribute('points', vertical[i]);
+        // distance-based styling (per-line) based on last mouse X
+        const mx = lastMouseRef.current.x;
+        const distX = Math.abs(pointsX[i] - mx);
+        const normX = Math.min(1, distX / (Math.max(width, height) * 0.5));
+        if (overEl) {
+          overEl.setAttribute('stroke-width', `${1.6 - normX * 0.9}`);
+          overEl.setAttribute('stroke-opacity', `${1 - normX * 0.7}`);
+        }
+        if (baseEl) {
+          baseEl.setAttribute('stroke-width', `${0.9 - normX * 0.4}`);
+          baseEl.setAttribute('stroke-opacity', `${0.6 - normX * 0.45}`);
+        }
       }
 
       if (!done) {
@@ -245,6 +320,7 @@ export default function Home() {
         height="100%"
         preserveAspectRatio="none"
         onMouseMove={onMouseMove}
+        onMouseDown={onMouseDown}
       >
           <defs>
             <radialGradient id="mouseSpot" ref={gradientRef} gradientUnits="userSpaceOnUse">
@@ -252,6 +328,14 @@ export default function Home() {
               <stop offset="60%" stopColor="#ffffff" stopOpacity="0.6" />
               <stop offset="100%" stopColor="#000000" stopOpacity="0" />
             </radialGradient>
+
+            <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
 
             <mask id="mouseMask">
               <rect x="0" y="0" width={width} height={height} fill="url(#mouseSpot)" />
@@ -278,7 +362,7 @@ export default function Home() {
           </g>
 
           {/* overlay brighter grid revealed by mask near mouse */}
-          <g className="grid-overlay" mask="url(#mouseMask)">
+          <g className="grid-overlay" mask="url(#mouseMask)" filter="url(#bloom)">
             {overlayHorizontalRefs.current.map((_, j) => (
               <polyline
                 key={`over-h-${j}`}
@@ -296,6 +380,12 @@ export default function Home() {
             ))}
           </g>
       </svg>
+      {/* centered hero card */}
+      <div className="hero-card" role="region" aria-label="intro">
+        <h1>Hey! I'm <span className="hero-name">Samyukta</span>.</h1>
+        <p>Undergraduate developer exploring fullstack and machine learning.</p>
+        <a className="learn-more" href="/about" aria-label="Learn more about Samyukta">Learn More</a>
+      </div>
     </div>
   );
 }
