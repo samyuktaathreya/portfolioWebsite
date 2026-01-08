@@ -110,7 +110,8 @@ html, body, #root {
   content:"";
   position:absolute;
   inset:0;
-
+  background:
+    radial-gradient(circle at 50% 45%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.35) 70%);
   pointer-events:none;
   z-index:1;
 }
