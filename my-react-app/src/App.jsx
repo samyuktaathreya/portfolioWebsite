@@ -48,7 +48,7 @@ export default function App() {
               e.preventDefault();
               scrollToSection('projects');
             }}
-          >Projects</a>
+          >Portfolio</a>
           <a href="#contact"
             onClick={(e) => {
               e.preventDefault();
