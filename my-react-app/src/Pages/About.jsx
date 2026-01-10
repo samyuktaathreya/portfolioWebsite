@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { FaFilePdf, FaCode }from "react-icons/fa";
+import Typed from 'typed.js';
 
 const scrollToSection = (id) => {
   if (typeof window === 'undefined') return;
@@ -12,77 +14,110 @@ const scrollToSection = (id) => {
 };
 
 export default function About() {
+    const sectionRef = useRef(null);
+    const [show,setShow] = useState(false);
+    useEffect(() => {
+      const el = sectionRef.current;
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setShow(true);
+          }
+          else {
+            setShow(false);
+          }
+        },
+        { threshold: 0.25 }
+      );
+      observer.observe(el);
+      return () => observer.disconnect();
+    }, []);
+
+  //typing effect
+  const quoteRef = useRef(null);
+  const typedRef = useRef(null);
+
+  useEffect(() => {
+    const container = sectionRef.current?.querySelector(".about-container");
+    if (!container || !quoteRef.current) return;
+
+    if (typedRef.current) {
+      typedRef.current.destroy();
+      typedRef.current = null;
+    }
+
+    if (!show) {
+      quoteRef.current.textContent = "";
+      return;
+    }
+
+    const startTyping = () => {
+      if (typedRef.current) return;
+      typedRef.current = new Typed(quoteRef.current, {
+        strings: ['"The best way to predict the future is to invent it."'],
+        typeSpeed: 50,
+        backSpeed: 0,
+        smartBackspace: true,
+      });
+    };
+
+    const onTransitionEnd = (e) => {
+      if (e.target === container && (e.propertyName === 'opacity' || e.propertyName === 'transform')) {
+        container.removeEventListener("transitioned", onTransitionEnd);
+        startTyping();
+      }
+    };
+
+    container.addEventListener("transitionend", onTransitionEnd);
+    
+    const fallback = setTimeout(startTyping, 700);
+    return () => {
+      container.removeEventListener("transitionend", onTransitionEnd);
+      clearTimeout(fallback);
+      if (typedRef.current) {
+        typedRef.current.destroy();
+        typedRef.current = null;
+      }
+    };
+  }, [show]);
+
     const [slide, setSlide] = useState(0);
 
     const goTo = (i) => setSlide(i);
 
     return (
-      <section id="about" className="about sec-pad">
-      <div className="main-container">
-        <div className="about__content">
-          <div className="about__content-main">
-            <h3 className="about__content-title">Get to know me!</h3>
-            <div className="about__slides">
-              <div className={`slide ${slide === 0 ? 'active' : ''}`}>
-                <div className="about__content-details">
-                  <p className="about__content-details-para">
-                    Hey! I’m <strong>Samyukta Athreya</strong>, a junior at
-                    <strong> Carnegie Mellon University</strong> studying Computer Engineering
-                    with a minor in AI. I love using my full stack and ML skills to build the apps I wish existed!
-                    You can check them out below.
-                  </p>
-                </div>
-                <a href="./#projects" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection('projects');
-                  }}
-                className="btn btn--med btn--theme dynamicBgClr">Projects</a>
-                <a href="/resume.pdf" className="btn btn--med btn--theme dynamicBgClr">Resume</a>
-              </div>
-
-              <div className={`slide ${slide === 1 ? 'active' : ''}`}>
-                <p className="about__content-details-para">
-                  In my free time, I enjoy running, language learning, and producing music. Check out my
-                  music here!
-                </p>
-                <iframe
-                  data-testid="embed-iframe"
-                  title="Spotify track"
-                  style={{ borderRadius: '12px', marginTop: '1rem' }}
-                  src="https://open.spotify.com/embed/track/2fQ6FuTCGKJ1QmHTGlsBdF?utm_source=generator"
-                  width="100%"
-                  height="152"
-                  frameBorder="0"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
-            </div>
-
-            <div className="slide-controls" role="group" aria-label="About slides">
-              <button className="arrow prev" onClick={() => setSlide(s => Math.max(0, s - 1))} aria-label="Previous slide">‹</button>
-              <button className="arrow next" onClick={() => setSlide(s => Math.min(1, s + 1))} aria-label="Next slide">›</button>
-            </div>
-          </div>
-          <div className="about__content-skills">
-            <h3 className="about__content-title">My Skills</h3>
-            <div className="skills">
-              <div className="skills__skill">HTML/CSS</div>
-              <div className="skills__skill">JavaScript/TypeScript</div>
-              <div className="skills__skill">React</div>
-              <div className="skills__skill">Python</div>
-              <div className="skills__skill">C/C++</div>
-              <div className="skills__skill">FastAPI</div>
-              <div className="skills__skill">CI/CD</div>
-              <div className="skills__skill">RESTful APIs</div>
-              <div className="skills__skill">Authentication (JWT)</div>
-              <div className="skills__skill">Git</div>
-              <div className="skills__skill">SQL/MongoDB</div>
-              <div className="skills__skill">AI/ML</div>
-            </div>
-          </div>
+      <section className="about-section" ref={sectionRef}>
+      <div className={`about-container ${show ? 'show' : ''}`}>
+        <h1 className="about-title reveal">About</h1>
+        <h2 className="about-quote">
+          <span className="quote-placeholder">"The best way to predict the future is to invent it."</span>
+          <div className="quote-typed"><span ref={quoteRef} /></div>
+        </h2>
+        
+        <div className="about-paragraph reveal">
+          <p>
+            Hi! I'm <span>Samyukta Athreya</span>, a junior at <span>Carnegie Mellon University</span> studying
+            Electrical & Computer Engineering with a minor in AI. My particular interests are full stack and AI, two fields that
+            give me the most power to create the apps I wish existed! You can check them out in the <span>Portfolio</span> section.
+          </p>
+          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+            <button className="resume-button">
+              <FaFilePdf style={{ marginRight: '10', transform: 'scale(0.9)', transform: 'translateY(2px)' }} />
+              Resume
+            </button>
+          </a>
+          <a href="#projects"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('projects');
+            }}
+          >
+          <button className="projects-button">
+            <FaCode style={{ marginRight: '10', transform: 'scale(0.9)', transform: 'translateY(2px)' }} />
+            Portfolio
+          </button>
+          </a>
         </div>
       </div>
       </section>
