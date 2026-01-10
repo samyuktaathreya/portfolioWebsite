@@ -33,6 +33,9 @@ body {
   background-size: cover;*/
 }
 
+html,body {
+  overflow-x:hidden;
+}
 /*body::before {
   content: "";
   position: absolute;
@@ -87,7 +90,7 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #6488ff;
 }
 button:focus,
 button:focus-visible {
