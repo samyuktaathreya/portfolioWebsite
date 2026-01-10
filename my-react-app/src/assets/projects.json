@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "name": "ThirdSpace",
+        "description": "Full-stack web app for discovering and reviewing productive public spaces, featuing search, filtering, and interactive maps using the Mapbox API. Built with React and a fastAPI backend to support user-submitted data and images.", 
+        "img": "/thirdspace-preview.png", 
+        "url": "https://samyuktaathreya.github.io/thirdspace/"
+    },
+    {
+        "id": 2,
+        "name": "Yet Another Chat App",
+        "description": "Real-time chat app built with TypeScript, Express, MongoDB, and WebSockets, featuring JWT authentication with bcrypt password hashing and REST APIs for user/session management. Deployed using GitHub Actions and Render for continuous delivery.",
+        "img": "/yaca-preview.png",
+        "url": "https://yaca-samyuktaa-f25.onrender.com"
+    }, 
+    {
+        "id": 3,
+        "name": "Accessible Web Interface for Robot Control",
+        "description": "React interface integrated with ROS (Robot Operating System) to enable real-time teleoperation and feedback from a robotic arm. Built to support accessbility in a human-robot interaction study, allowing participants to control physical hardware through a browser-based system.",
+        "img": "/robotic-interface-preview.png",
+        "url" : ""
+    },
+    {
+        "id": 4,
+        "name": "No More Vibecoding!",
+        "description": "Built a Chrome extension that blocks copying from popular LLM interfaces to encourage active problem-solving and reduce over-reliance on generated code during learning.",
+        "img": "/no-more-vibecoding-preview.png",
+        "url": "https://github.com/samyuktaathreya/ban-vibecoding"
+    }
+]
