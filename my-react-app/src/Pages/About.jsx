@@ -101,23 +101,25 @@ export default function About() {
             Electrical & Computer Engineering with a minor in AI. My particular interests are full stack and AI, two fields that
             give me the most power to create the apps I wish existed! You can check them out in the <span>Portfolio</span> section.
           </p>
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
-            <button className="resume-button">
-              <FaFilePdf style={{ marginRight: '10', transform: 'scale(0.9)', transform: 'translateY(2px)' }} />
-              Resume
+          <div className="aboutButtons">
+            <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+              <button className="resume-button">
+                <FaFilePdf style={{ marginRight: '10', transform: 'scale(0.9)', transform: 'translateY(2px)' }} />
+                Resume
+              </button>
+            </a>
+            <a href="#projects"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToSection('projects');
+              }}
+            >
+            <button className="projects-button">
+              <FaCode style={{ marginRight: '10', transform: 'scale(0.9)', transform: 'translateY(2px)' }} />
+              Portfolio
             </button>
-          </a>
-          <a href="#projects"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('projects');
-            }}
-          >
-          <button className="projects-button">
-            <FaCode style={{ marginRight: '10', transform: 'scale(0.9)', transform: 'translateY(2px)' }} />
-            Portfolio
-          </button>
-          </a>
+            </a>
+          </div>
         </div>
       </div>
       </section>

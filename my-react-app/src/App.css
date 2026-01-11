@@ -283,6 +283,7 @@ html, body, #root {
   display:flex;
   align-items:flex-start;
   margin-top:20px;
+  margin-bottom:100px;
   position:relative;
 }
 
@@ -328,11 +329,17 @@ html, body, #root {
   opacity: 0;
   transform: translateY(20px) scale(0.98);
   transition: opacity 600ms ease, transform 600ms ease;
-  max-width:1000px;
+  /*max-width:1000px;*/
+  max-width:1320px;
   margin: 0 auto;
   padding: 64px 48px;
 
-  border: none;
+  border:none;
+  border-radius:10px;
+
+  display:flex;
+  flex-direction:column;
+  align-items: stretch;
 }
 
 .portfolio-container.show {
@@ -427,15 +434,19 @@ html, body, #root {
 
 .selection-bar-container button {
   padding: 10px 100px;
-  background-color: transparent;
   font-size:1rem;
   font-weight:700;
 }
 
 .selection-bar-container button:hover {
+  background-color: rgba(86,125,160,0.25);
+  border-color:rgba(86,125,160,0.25);
+  font-weight:700;
+  color:white;
+}
+
+.selection-bar-container button:hover div {
   transform: translateY(-2px);
-  background-color: rgba(255,255,255,0.10);
-  border:none;
 }
 
 .projects-grid {
@@ -453,10 +464,25 @@ html, body, #root {
   border:1px solid rgba(255,255,255,0.10);
   border-radius:10px;
 
-  padding: 10px 10px;
+  padding:10px 10px;
+
+  margin-top:10px;
+  margin-left:10px;
+  margin-right:10px;
+  margin-bottom:40px;
 
   backdrop-filter:blur(2px);
   -webkit-backdrop-filter:blur(12px);
+
+  display:flex;
+  flex-direction:column;
+
+  transition:transform 200 ms ease, box-shadow 200ms ease;
+}
+
+.project-card-container:hover {
+  border:2px;
+  border-color: #567da0;
 }
 
 .project-card-container h1 {
@@ -468,12 +494,20 @@ html, body, #root {
   font-size: 1rem;
 }
 
+.project-card-actions{
+  margin-top: auto;
+  justify-content: space-between;
+  gap: 30px;
+  display:flex;
+}
+
 .about-title {
   color: #386590; /* dark blue */
   font-size:5rem;
   margin-top:0px;
   margin-bottom:50px;
   font-weight:400;
+  text-align:left;
 }
 
 .about-quote {
@@ -483,6 +517,7 @@ html, body, #root {
   font-size:1.1rem;
   font-family:jetbrains mono, monospace;
   position:relative;
+  text-align:center;
 }
 
 .quote-placeholder {
@@ -493,6 +528,15 @@ html, body, #root {
   position:absolute;
   top:0;
   left:0;
+  text-align:center;
+}
+
+.show-more-btn {
+  position: fixed;
+  bottom: 24px;
+  left:50%;
+  transform: translateX(-50%);
+  z-index:1;
 }
 
 .about-paragraph {
@@ -509,8 +553,12 @@ html, body, #root {
   font-weight: 600;
 }
 
+.about-buttons {
+  align-items:left;
+}
+
 .about-paragraph button {
-  margin: 0 10px;
+  margin-right:20px;
 }
 
 .about-paragraph button:hover {
@@ -555,4 +603,42 @@ html, body, #root {
   object-fit:cover;
   object-position:left top;
   border-radius:8px;
+  transition: transform 300ms ease;
+}
+
+.project-card-container:hover .project-preview-img {
+  transform: scale(1.05);
+}
+
+.bounce {
+  animation: bounce 0.9s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(3px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.sel-btn-active {
+  background-color: #567da0;
+}
+
+.sel-btn {
+  background-color: transparent;
+  color: rgba(255,255,255,0.5)
+}
+
+.projects-button-portfolio:hover {
+  opacity: 1;
+  color: white;
+  transform: rotateX(45);
 }
