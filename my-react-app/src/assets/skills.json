@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Programming Languages",
+        "id": 1,
+        "list": ["Python", "TypeScript", "JavaScript", "C++", "C", "Java", "Bash"]
+    }, 
+    {
+        "name": "Web/Full Stack",
+        "id": 2,
+        "list": ["React", "TypeScript", "Node.js", "Express.js", "MongoDB", "Mongoose", "Socket IO", "REST APIs", "JWT", "FastAPI"]
+    },
+    {
+        "name": "AI/ML",
+        "id": 3,
+        "list": ["Pytorch", "Tensorflow", "scikit-learn", "NumPy", "Pandas"]
+    },
+    {
+        "name": "DevOps & Dev Tools",
+        "id": 4,
+        "list": ["Git", "GitHub", "GitHub Actions", "Render (Cloud Deployment)", "Parcel", "ESLint", "Prettier"]
+    }
+]

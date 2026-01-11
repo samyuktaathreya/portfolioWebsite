@@ -2,14 +2,26 @@
 import React from 'react';
 import {useState, useEffect, useRef} from 'react';
 import projects from '../assets/projects.json';
+import skills from '../assets/skills.json';
 import { FaLayerGroup, FaCode, FaCaretDown }from "react-icons/fa";
+import {skillIconMap} from "../assets/iconMap.jsx";
 
 const scrollToSection = (id) => {
   if (typeof window === 'undefined') return;
   const container = document.getElementById('sections');
   const target = document.getElementById(id);
+  if (!target) return;
   target.scrollIntoView({behavior: 'smooth', block: 'end'});
 };
+
+const onClickLiveDemoBtn = (projectUrl) => {
+    if (projectUrl === "") {
+        window.alert("No Live Demo available for this project. See details for more info");
+    }
+    else {
+        window.open(projectUrl, '_blank', 'noopener,noreferrer')
+    }
+}
 
 function ProjectCard({project}) {
 
@@ -28,7 +40,7 @@ function ProjectCard({project}) {
             <div className="project-card-actions">
                 <button 
                     className="project-card-live-demo"
-                    onClick={() => window.open(project.url, '_blank', 'noopener,noreferrer')}
+                    onClick={() => onClickLiveDemoBtn(project.url)}
                 >
                     Live Demo
                 </button>
@@ -78,18 +90,52 @@ function ProjectsBar({projects, lastProjectCard}) {
     );
 }
 
-function SkillsBar() {
+function SkillsBar({skills, lastSkill}) {
     return (
-        <div>
-
+        <div className="skills-container">
+            {skills.map(skillCategory => (
+                <SkillsCard key={skillCategory.id} skillCategory={skillCategory} />
+            ))}
+            <div ref={lastSkill} style={{height: "1px"}} id="lastSkill"></div> {/* empty div just to check if the last card is visible*/}
         </div>
     );
 }
 
-function ShowMoreBtn() {
+function SkillsCard({skillCategory}) {
+    return (
+        <div className="skill-category-container">
+            <div className="skill-category-name">{skillCategory.name}</div>
+            <div className="skills">
+            {skillCategory.list.map(skill => 
+                <SkillCard skill={skill} key={skill} />
+            )}
+            </div>
+        </div>
+    );
+}
+
+function SkillCard({skill}) {
+    const Icon = skillIconMap[skill.toLowerCase()];
+    return (
+        <div className="skill-card">
+            {Icon}
+            <h1 className="skill-name">{skill}</h1>
+        </div>  
+    )
+}
+
+function ShowMoreBtn({selected}) {
+    let scrollSelect = "";
+    if (selected === 'projects')
+    {
+        scrollSelect = "lastProject";
+    }
+    else {
+        scrollSelect = "lastSkill";
+    }
     return (
         <button className="show-more-btn"
-        onClick = {() => scrollToSection("lastProject")}>
+        onClick = {() => scrollToSection(scrollSelect)}>
             <FaCaretDown className="bounce" />
         </button>
     );
@@ -119,11 +165,14 @@ export default function Projects() {
     }, []);
 
     const lastProjectCard = useRef(null);
+    const lastSkill = useRef(null);
     const [showMoreBtn, setShowMoreBtn] = useState(true);
     useEffect(() => {
         const rootEl = document.querySelector('.sections');
         const el = lastProjectCard.current;
-        if (!el || !rootEl) return;
+        const skillEl = lastSkill.current;
+        if (selected==='projects' && (!el || !rootEl)) return;
+        if (selected==='skills' && (!skillEl || !rootEl)) return;
 
         const observer = new IntersectionObserver(
             ([entry]) => {
@@ -136,7 +185,13 @@ export default function Projects() {
             },
             { root:rootEl, threshold: 1 }
         );
-        observer.observe(el);
+        if (selected === 'projects') {
+            observer.observe(el);
+        }
+        else 
+        {
+            observer.observe(skillEl);
+        }
         return () => observer.disconnect();
     }, [selected]);
 
@@ -147,9 +202,9 @@ export default function Projects() {
 
                 <SelectionBar selected={selected} onChange={setSelected} />
 
-                {selected === 'projects' ? <ProjectsBar projects={projects} lastProjectCard={lastProjectCard}/> : <SkillsBar />}
+                {selected === 'projects' ? <ProjectsBar projects={projects} lastProjectCard={lastProjectCard}/> : <SkillsBar skills={skills} lastSkill={lastSkill}/>}
             </div>
-            {selected === 'projects' && show && showMoreBtn ? <ShowMoreBtn/> : null}
+            {show && showMoreBtn ? <ShowMoreBtn selected={selected}/> : null}
         </section>
     );
 }

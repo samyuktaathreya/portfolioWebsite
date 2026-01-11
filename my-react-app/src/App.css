@@ -279,7 +279,7 @@ html, body, #root {
 
 .portfolio-section {
   min-height:100vh;
-  min-width:100vw;
+  width:100%;
   display:flex;
   align-items:flex-start;
   margin-top:20px;
@@ -287,15 +287,17 @@ html, body, #root {
   position:relative;
 }
 
+.contact-section,
 .about-section {
   min-height:100vh;
-  min-width:100vw;
+  min-width:100%;
   display:flex;
   align-items:flex-start;
   padding:80px 24px;
   position:relative;
 }
 
+.contact-section::before,
 .portfolio-section::before,
 .about-section::before{
   content: "";
@@ -306,7 +308,7 @@ html, body, #root {
   z-index:-1;
 }
 
-
+.contact-container,
 .about-container{
   opacity: 0;
   transform: translateY(20px) scale(0.98);
@@ -340,6 +342,8 @@ html, body, #root {
   display:flex;
   flex-direction:column;
   align-items: stretch;
+
+  flex-grow:1;
 }
 
 .portfolio-container.show {
@@ -361,6 +365,7 @@ html, body, #root {
 
 }
 
+.contact-container.show,
 .about-container.show {
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -641,4 +646,86 @@ html, body, #root {
   opacity: 1;
   color: white;
   transform: rotateX(45);
+}
+
+.skills-container {
+  max-width:1320px;
+  display:grid;
+  grid-template-columns: repeat(2,1fr);
+  gap:2rem;
+  margin:0 auto;
+  width:100%;
+  justify-items:stretch;
+}
+
+.skill-category-container {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:10px;
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+
+  margin-top:20px;
+  padding:20px 20px;
+
+
+}
+
+.skill-card {
+  border-radius:4px;
+  width: auto;
+  height:30px;
+  display:flex;
+  flex-direction:row;
+
+  margin-bottom:10px;
+  margin-right:15px;
+  justify-content:center;
+  align-items:center;
+
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.10);
+  border-radius:10px;
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+
+  box-shadow:0 10px 30px rgba(0,0,0,0.35);
+
+  margin-top:20px;
+  padding: 10px 10px;
+
+  flex-basis: 150px;
+}
+
+.skill-card:hover {
+  transform:translateY(-2px);
+}
+
+.skill-name {
+  font-size:1rem;
+}
+
+.skill-logo-java, 
+.skill-logo-parcel,
+.skill-logo {
+  margin-right:10px;
+  width:10%;
+  height:auto;
+}
+
+.skill-category-name {
+  font-size:1.2rem;
+  font-weight: 700;
+  margin-bottom:20px;
+}
+
+.skills {
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:space-evenly;
 }
