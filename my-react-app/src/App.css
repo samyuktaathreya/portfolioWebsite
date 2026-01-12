@@ -206,6 +206,25 @@ html, body {
   backdrop-filter: blur(8px) saturate(120%);
 }
 
+/* iPhone fixes */
+@media (max-width: 640px) {
+  .projects-grid { grid-template-columns: 1fr; gap: 24px; }
+
+  .skills-container { grid-template-columns: 1fr; gap: 1rem; }
+
+  .selection-bar-container button { padding: 10px 14px; }
+
+  /* iOS scroll container stability */
+  .sections { scroll-snap-type: none; overflow-x: hidden; }
+  .page-section { scroll-snap-align: none; }
+
+  .portfolio-container,
+  .portfolio-container.show { padding: 28px 16px; }
+
+  .portfolio-title { font-size: 2.2rem; }
+}
+
+
 .hero-card h1 {
   margin: 0 0 0.75rem 0;
   font-size: 4rem;
