@@ -14,6 +14,8 @@ html, body {
   --topbar-height: 64px;
 }
 
+*, *::before, *::after {box-sizing:border-box};
+
 /* Keep content centered when sections aren't full-bleed, but allow full-bleed sections */
 #root {
   box-sizing: border-box;
@@ -101,7 +103,9 @@ html, body {
 .sections::before {
   content: "";
   position:absolute;
-  inset:-200px;
+  inset: 0;
+  transform:scale(1.25);
+  transform-origin:center;
   background: radial-gradient(circle at 60% 30%, rgba(100,108,255,0.08), transparent 50%);
   pointer-events:none;
 }
@@ -136,6 +140,7 @@ html, body {
   right: 0;
   bottom: 0;
   overflow-y: auto;
+  overflow-x:hidden;
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
 }
@@ -281,7 +286,7 @@ html, body {
 
 */
 .projects-details-page {
-  width:100vw;
+  width:100%;
 }
 .portfolio-section {
   min-height:100vh;
@@ -515,7 +520,7 @@ html, body {
     grid-template-columns: 1fr;
   }
 
-  .projects-card-container {
+  .project-card-container {
     margin-left: 0;
     margin-right: 0;
   }
